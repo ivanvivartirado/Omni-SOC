@@ -1,0 +1,11 @@
+$ORIGIN 1.168.192.in-addr.arpa.
+$TTL 86400
+@   IN  SOA ns1.laboratorio.local. admin.laboratorio.local. (
+            2026100701 ; Serial
+            3600       ; Refresh
+            900        ; Retry
+            604800     ; Expire
+            86400 )    ; Negative Cache TTL
+;
+@   IN  NS  ns1.laboratorio.local.
+50  IN  PTR ns1.laboratorio.local.

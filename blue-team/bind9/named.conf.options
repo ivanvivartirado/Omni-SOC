@@ -1,0 +1,24 @@
+acl locales {
+    localhost;
+    192.168.1.0/24; # Reemplaza por el rango de tu red
+};
+
+options {
+    directory "/var/cache/bind";
+
+    // Permitir consultas solo a la red local
+    allow-query { locales; };
+
+    // Permitir resoluciones recursivas
+    recursion yes;
+
+    // Servidores DNS externos (Cloudflare / Google)
+    forwarders {
+        1.1.1.1;
+        8.8.8.8;
+    };
+
+    listen-on { any; };
+    listen-on-v6 { any; };
+    dnssec-validation auto;
+};

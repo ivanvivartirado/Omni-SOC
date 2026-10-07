@@ -1,0 +1,19 @@
+// Pega aquí TU clave idéntica a la generada
+key "kea-bind-key" {
+        algorithm hmac-sha256;
+        secret "S1mP1eK3yS3cr3tStr1ngG0esH3r3M4yB3Longer=";
+};
+
+// Zona de búsqueda directa
+zone "laboratorio.local" {
+    type master;
+    file "/var/lib/bind/db.laboratorio.local";
+    allow-update { key "kea-bind-key"; };
+};
+
+// Zona de búsqueda inversa (para la red 192.168.1.0/24)
+zone "1.168.192.in-addr.arpa" {
+    type master;
+    file "/var/lib/bind/db.1.168.192";
+    allow-update { key "kea-bind-key"; };
+};

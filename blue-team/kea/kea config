@@ -1,3 +1,6 @@
+// Este archivo de configuración para definir la subred, el rango de IPs, reservas de IPs...
+// Para aplicar cambios hacer este comando: sudo kea-dhcp4 -t -c /etc/kea/kea-dhcp4.conf
+
 {
 "Dhcp4": {
     "interfaces-config": {

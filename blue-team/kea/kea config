@@ -13,40 +13,32 @@
         "name": "/var/lib/kea/dhcp4.leases"
     },
 
-    "valid-lifetime": 86400,  
+    "valid-lifetime": 86400,
 
     "subnet4": [
         {
+            "id": 1,
             "subnet": "192.168.15.0/24",
             "pools": [
-                { "pool": "192.168.15.120 - 192.168.15.170" } // Rango DHCP
+                { "pool": "192.168.15.200 - 192.168.15.230" }
             ],
             "option-data": [
-                {
-                    "name": "routers",
-                    "data": "192.168.15.10" // Gateway
-                },
-                {
-                    "name": "domain-name-servers",
-                    "data": "192.168.15.50, 1.1.1.1" // IP Server dhcp + DNS
-                },
-                {
-                    "name": "domain-name",
-                    "data": "omnisoc.local"
-                }
+                { "name": "routers", "data": "192.168.15.10" },
+                { "name": "domain-name-servers", "data": "192.168.15.122, 1.1.1.1" },
+                { "name": "domain-name", "data": "omnisoc.local" }
             ],
             "reservations": [
                 {
-                    "hw-address": "aa:bb:cc:dd:ee:ff",
-                    "ip-address": "192.168.15.171",
-                    "hostname": "omni-client"
+                    "hw-address": "08:00:27:ac:68:ac",
+                    "ip-address": "192.168.15.165",
+                    "hostname": "omni-cliente"
+                },
+                {
+                    "hw-address": "08:00:27:5a:87:bc",
+                    "ip-address": "192.168.15.164",
+                    "hostname": "omni-kali"
                 }
             ]
-            "reservations": [
-                {
-                    "hw-address": "aa:bb:cc:dd:ee:ff",
-                    "ip-address": "192.168.15.172",
-                    "hostname": "omni-kali"
         }
     ]
 }

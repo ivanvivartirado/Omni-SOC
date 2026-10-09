@@ -1,7 +1,7 @@
 // Pega aquí TU clave idéntica a la generada
 key "kea-bind-key" {
         algorithm hmac-sha256;
-        secret "S1mP1eK3yS3cr3tStr1ngG0esH3r3M4yB3Longer=";
+        secret "CAMBIAR_POR_TU_CLAVE_TSIG";
 };
 
 // Zona de búsqueda directa

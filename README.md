@@ -4,6 +4,37 @@ Infraestructura de red que simula el entorno de una pequeña o mediana empresa, 
 
 Proyecto de ciclo formativo (ASIR/ASIX), pensado como práctica integral de administración de sistemas en red combinada con ciberseguridad ofensiva y defensiva (red team / blue team).
 
+## Estructura del repositorio
+
+```
+Omni-SOC/
+├── blue-team/            # Defensa: servicios y configuraciones del servidor
+│   ├── kea/              #   DHCP (kea-dhcp4.conf)
+│   ├── bind9/            #   DNS (zonas, opciones, INSTRUCCIONES.md)
+│   └── ufw/              #   Firewall del servidor (reglas)
+├── red-team/             # Ataque: herramientas y escenarios (Kali)
+├── monitorizacion/       # Wazuh, alertas y reglas de deteccion
+├── infra/                # IaC: despliegue reproducible
+├── scripts/
+│   └── subir.sh          # Consulta el estado de Git sin modificar archivos
+└── docs/
+    ├── propuesta.md
+    └── img/diagrama-red.png
+```
+
+## Como subir cambios
+
+En el servidor, despues de tocar cualquier configuracion:
+
+```bash
+cd ~/Omni-SOC
+./scripts/subir.sh --ver
+```
+
+El script `scripts/subir.sh --ver` muestra el estado de Git sin modificar archivos. La sincronizacion de configuraciones, la revision de secretos y la publicacion se realizan manualmente para evitar subir datos sensibles o cambios no deseados.
+
+Convencion de mensajes: `area: que se ha cambiado` (por ejemplo `ufw: abierto puerto 1514`, `bind9: zona inversa`, `docs: diagrama actualizado`).
+
 ## 1. Idea del proyecto
 
 ### Título

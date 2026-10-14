@@ -1,7 +1,6 @@
-// Pega aquí TU clave idéntica a la generada
 key "kea-bind-key" {
-        algorithm hmac-sha256;
-        secret "CAMBIAR_POR_TU_CLAVE_TSIG";
+	algorithm hmac-sha256;
+	secret "CAMBIAR_POR_TU_CLAVE_TSIG";
 };
 
 // Zona de búsqueda directa
@@ -17,3 +16,4 @@ zone "1.168.192.in-addr.arpa" {
     file "/var/lib/bind/db.1.168.192";
     allow-update { key "kea-bind-key"; };
 };
+

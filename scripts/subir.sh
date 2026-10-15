@@ -71,8 +71,27 @@ if [[ $SOLO_VER -eq 1 ]]; then
   exit 0
 fi
 
+# ---- Quien eres: el commit saldra a nombre de esa persona -------------------
+# Rellena nombre y email de cada uno (el email noreply sale de GitHub > Settings > Emails)
+declare -A NOMBRE=( [ivan]="Ivan Vivar"  [iker]="Iker Sanchez" )
+declare -A EMAIL=(  [ivan]="183842281+ivaanv23@users.noreply.github.com"
+                    [iker]="195279356+ikersafu@users.noreply.github.com" )
+
+QUIEN="${OMNISOC_USER:-}"
+if [[ -z "$QUIEN" ]]; then
+  echo "==> ¿Quién sube los cambios?"
+  select QUIEN in "${!NOMBRE[@]}"; do [[ -n "$QUIEN" ]] && break; done
+fi
+if [[ -z "${NOMBRE[$QUIEN]:-}" ]]; then
+  echo "!! Usuario desconocido: $QUIEN" >&2; exit 1
+fi
+export GIT_AUTHOR_NAME="${NOMBRE[$QUIEN]}"  GIT_AUTHOR_EMAIL="${EMAIL[$QUIEN]}"
+export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME" GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+echo "==> Subiendo como: $GIT_AUTHOR_NAME <$GIT_AUTHOR_EMAIL>"
+
 git add -A
 git commit -m "${MSG:-sync: configs $(date '+%F %H:%M') desde $(hostname)}"
 git pull --rebase --autostash
 git push origin HEAD
 echo "==> Subido a GitHub."
+

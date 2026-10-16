@@ -14,7 +14,7 @@ suricata-version: "8.0"
 
 vars:
   address-groups:
-    HOME_NET: "[192.168.1.0/24]" # Coloca aquí tu subred real
+    HOME_NET: "[192.168.15.0/24]" # Coloca aquí tu subred real
     EXTERNAL_NET: "!$HOME_NET"
 
     HTTP_SERVERS: "$HOME_NET"

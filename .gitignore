@@ -1,0 +1,17 @@
+# Secretos y claves: nunca al repo
+.env
+*.key
+*.pem
+*.tsig
+
+# Basura de editores y sistema
+*.swp
+*~
+.DS_Store
+
+# Logs y datos de ejecucion
+*.log
+*.csv
+
+# Copias de seguridad locales de scripts
+scripts/*.bak.*

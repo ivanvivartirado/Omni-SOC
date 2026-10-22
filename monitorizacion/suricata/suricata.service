@@ -1,0 +1,11 @@
+# Define the Suricata systemd unit
+[Unit]
+Description=Suricata IDS/IPS
+After=network.target
+
+# Specify the Suricata binary path, the configuration files location, and the network interface
+[Service]
+ExecStart=/usr/bin/suricata -c /etc/suricata/suricata.yaml -i enp0s8
+[Install]
+
+WantedBy=default.target

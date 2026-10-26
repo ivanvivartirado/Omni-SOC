@@ -1,0 +1,11 @@
+$ORIGIN omnisoc.local.
+$TTL 86400
+@   IN  SOA ns1.omnisoc.local. admin.omnisoc.local. (
+            2026100701 ; Serial (Formato: YYYYMMDDNN)
+            3600       ; Refresh
+            900        ; Retry
+            604800     ; Expire
+            86400 )    ; Negative Cache TTL
+;
+@   IN  NS  ns1.omnisoc.local.
+ns1 IN  A   192.168.15.50

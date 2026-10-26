@@ -1,0 +1,11 @@
+[Unit]
+Description=Suricata IDS/IPS
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/suricata -c /etc/suricata/suricata.yaml --af-packet=enp0s8
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

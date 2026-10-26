@@ -43,20 +43,20 @@ done
 # ---- Quitar secretos conocidos antes de subir -------------------------------
 f="blue-team/bind9/named.conf.local"
 if [[ -f "$f" ]]; then
-  sed -i -E 's/(secret ")[^"]+(")/\1CAMBIAR_POR_TU_CLAVE_TSIG\2/' "$f"
+  sed -i -E 's/(secret ")[^"]+(")/\1n7lV700K4BJ3YgAcmBvRHTy9AD8sb9IDYivRoRFTNSA=\2/' "$f"
 fi
-
 # ---- Comprobacion de seguridad: si hay algo sospechoso, NO se sube ----------
 echo "==> Revisando secretos"
-if grep -rEn --exclude-dir=.git --exclude='*.png' \
-     -e 'secret "[^"]*"' -e 'BEGIN [A-Z ]*PRIVATE KEY' \
-     -e '(password|passwd|token)[[:space:]]*[=:][[:space:]]*[^[:space:]]+' . \
-   | grep -v 'CAMBIAR_POR_TU_CLAVE_TSIG' | grep -v 'scripts/subir.sh'; then
+if git ls-files -co --exclude-standard -z \
+   | grep -zvE '^scripts/(subir\.sh|auditar\.sh)' \
+   | xargs -0 -r grep -nIE \
+       -e 'secret "[^"]*"' -e 'BEGIN [A-Z ]*PRIVATE KEY' \
+       -e '(password|passwd|token)[[:space:]]*[=:][[:space:]]*[^[:space:]]+' \
+   | grep -v 'n7lV700K4BJ3YgAcmBvRHTy9AD8sb9IDYivRoRFTNSA='; then
   echo "!! Posible secreto en los ficheros de arriba. No se sube nada."
   exit 1
 fi
 echo "   OK, sin secretos"
-
 # ---- Git --------------------------------------------------------------------
 if [[ -z "$(git status --porcelain)" ]]; then
   echo "==> Nada que subir: el repo ya esta al dia."

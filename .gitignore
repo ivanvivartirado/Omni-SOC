@@ -15,3 +15,9 @@
 
 # Copias de seguridad locales de scripts
 scripts/*.bak.*
+
+# Certificados y claves generados de Wazuh
+docker-compose/wazuh-docker/**/wazuh_indexer_ssl_certs/
+*.key
+*-key.pem
+docker-compose/wazuh-docker/

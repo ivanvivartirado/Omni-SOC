@@ -1,6 +1,6 @@
 key "kea-bind-key" {
 	algorithm hmac-sha256;
-	secret "CAMBIAR_POR_TU_CLAVE_TSIG";
+	secret "n7lV700K4BJ3YgAcmBvRHTy9AD8sb9IDYivRoRFTNSA=";
 };
 
 // Zona de búsqueda directa

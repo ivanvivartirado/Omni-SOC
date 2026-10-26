@@ -45,6 +45,9 @@
 -A ufw-user-input -p tcp --dport 22 -j ACCEPT
 -A ufw-user-input -p udp --dport 22 -j ACCEPT
 
+### tuple ### allow tcp 5636 0.0.0.0/0 any 0.0.0.0/0 in
+-A ufw-user-input -p tcp --dport 5636 -j ACCEPT
+
 ### END RULES ###
 
 ### LOGGING ###

@@ -1,6 +1,6 @@
 acl locales {
     localhost;
-    192.168.1.0/24; # Reemplaza por el rango de tu red
+    192.168.15.0/24; # Reemplaza por el rango de tu red
 };
 
 options {

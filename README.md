@@ -12,18 +12,21 @@ Omni-SOC/
 │   ├── apache2/            #   Web: configuración y www/ (index.html)
 │   ├── bind9/              #   DNS: zonas, opciones, INSTRUCCIONES.md
 │   ├── kea/                #   DHCP: kea-dhcp4.conf
+│   ├── panel/              #   Blue Team Command Center (panel web del SOC, ver su README)
 │   └── ufw/                #   Firewall del servidor (reglas)
 ├── red-team/               # Ataque: herramientas y escenarios (Kali)
 ├── monitorizacion/
 │   ├── suricata/           #   IDS: suricata.yaml, servicio, EveBox
 │   └── wazuh/              #   SIEM: reglas y decoders propios
 ├── infra/                  # IaC: Vagrant + Ansible (despliegue reproducible)
+│   └── ansible/            #   panel.yml: despliegue del panel en omni-server
 ├── scripts/
 │   ├── subir.sh            # Copia las configs del servidor al repo y sube a GitHub
 │   ├── auditar.sh          # Auditoría del servidor (log privado, sin secretos)
 │   └── backup.sh           # Backup semanal (cron de root)
 └── docs/
     ├── propuesta.md
+    ├── panel/              # Arquitectura, métricas, seguridad y API del panel
     └── img/diagrama-red.png
 ```
 

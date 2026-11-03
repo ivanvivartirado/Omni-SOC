@@ -1,0 +1,48 @@
+# Omni SOC - Blue Team Command Center
+# Uso: cp .env.example .env && docker compose up -d --build  ->  https://<host>:8443
+name: omni-soc-panel
+
+services:
+  api:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - panel-data:/data
+      # Modo real (fase 2-3): fuentes locales de omni-server en solo lectura
+      # - /var/log/suricata:/var/log/suricata:ro
+      # - /var/lib/kea:/var/lib/kea:ro
+      # - /etc/kea:/etc/kea:ro
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    mem_limit: ${API_MEM_LIMIT:-256m}
+    cpus: 1.0
+    logging: &logging
+      driver: json-file
+      options: { max-size: "5m", max-file: "3" }
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      PANEL_HOSTNAME: ${PANEL_HOSTNAME:-omni-server.omnisoc.local}
+      PANEL_IP: ${PANEL_IP:-192.168.15.122}
+    ports:
+      - "${PANEL_BIND:-0.0.0.0}:${PANEL_PORT:-8443}:8443"
+    volumes:
+      - panel-certs:/etc/nginx/certs
+    security_opt: [no-new-privileges:true]
+    mem_limit: ${WEB_MEM_LIMIT:-64m}
+    cpus: 0.5
+    logging: *logging
+
+volumes:
+  panel-data:
+  panel-certs:

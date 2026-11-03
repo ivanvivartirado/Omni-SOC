@@ -1,0 +1,7 @@
+# Despliega el Blue Team Command Center en omni-server.
+# Uso: ansible-playbook -i inventario.ini infra/ansible/panel.yml --ask-become-pass
+- name: Panel Omni SOC
+  hosts: omni_server
+  become: true
+  roles:
+    - omni_panel

@@ -1,0 +1,2 @@
+[omni_server]
+omni-server ansible_host=192.168.15.122 ansible_user=ubuntu

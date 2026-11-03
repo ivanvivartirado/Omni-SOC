@@ -1,0 +1,5 @@
+- name: Reiniciar panel
+  ansible.builtin.command:
+    cmd: docker compose up -d --build --force-recreate --wait
+    chdir: "{{ panel_dir }}/blue-team/panel"
+  changed_when: true

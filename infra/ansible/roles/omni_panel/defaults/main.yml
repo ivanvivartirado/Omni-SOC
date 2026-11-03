@@ -1,0 +1,11 @@
+panel_dir: /opt/omni-soc-panel
+panel_repo: https://github.com/ivanvivartirado/Omni-SOC.git
+panel_version: Prueba1
+panel_port: 8443
+panel_demo_mode: true
+panel_hostname: omni-server.omnisoc.local
+panel_ip: "{{ ansible_host | default('192.168.15.122') }}"
+# Definir en un vault (ansible-vault), nunca en claro en el repo
+panel_admin_password: ""
+panel_api_mem_limit: 256m
+panel_web_mem_limit: 64m

@@ -1,0 +1,33 @@
+- name: Docker y git instalados
+  ansible.builtin.apt:
+    name: [docker.io, docker-compose-v2, git]
+    state: present
+    update_cache: true
+
+- name: Código del panel
+  ansible.builtin.git:
+    repo: "{{ panel_repo }}"
+    dest: "{{ panel_dir }}"
+    version: "{{ panel_version }}"
+  notify: Reiniciar panel
+
+- name: Fichero .env (permisos 0600)
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ panel_dir }}/blue-team/panel/.env"
+    mode: "0600"
+  notify: Reiniciar panel
+
+- name: Puerto del panel abierto en UFW
+  community.general.ufw:
+    rule: allow
+    port: "{{ panel_port | string }}"
+    proto: tcp
+    from_ip: 192.168.15.0/24
+
+- name: Panel arrancado
+  ansible.builtin.command:
+    cmd: docker compose up -d --build --wait
+    chdir: "{{ panel_dir }}/blue-team/panel"
+  register: panel_up
+  changed_when: "'Started' in panel_up.stderr or 'Recreated' in panel_up.stderr"

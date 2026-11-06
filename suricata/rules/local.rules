@@ -1,0 +1,1 @@
+alert icmp any any -> $HOME_NET any (msg:"PING detectado (ICMP echo request)"; itype:8; sid:1000001; rev:2;)

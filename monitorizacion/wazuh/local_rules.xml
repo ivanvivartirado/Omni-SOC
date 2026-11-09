@@ -1,0 +1,26 @@
+<group name="local,omnisoc,">
+
+  <rule id="100100" level="4">
+    <if_sid>86601</if_sid>
+    <field name="alert.signature_id">^1000001$</field>
+    <description>Omni-SOC: Ping recibido desde $(src_ip)</description>
+    <group>omnisoc_recon,</group>
+  </rule>
+
+  <rule id="100101" level="8">
+    <if_sid>86601</if_sid>
+    <field name="alert.signature_id">^1000002$</field>
+    <description>Omni-SOC: Escaneo de puertos desde $(src_ip)</description>
+    <mitre><id>T1046</id></mitre>
+    <group>omnisoc_recon,</group>
+  </rule>
+
+  <rule id="100102" level="7">
+    <if_sid>86601</if_sid>
+    <field name="alert.signature">^ET SCAN</field>
+    <description>Omni-SOC: Reconocimiento detectado ($(alert.signature)) desde $(src_ip)</description>
+    <mitre><id>T1595</id></mitre>
+    <group>omnisoc_recon,</group>
+  </rule>
+
+</group>

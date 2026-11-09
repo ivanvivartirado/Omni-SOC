@@ -28,6 +28,12 @@ MAPA=(
   "/etc/apache2/sites-available/000-default.conf|blue-team/apache2/sites-available/000-default.conf"
   "/var/www/html/index.html|blue-team/apache2/www/index.html"
   "/etc/suricata/suricata.yaml|monitorizacion/suricata/suricata.yaml"
+  "/etc/suricata/rules/local.rules|monitorizacion/suricata/rules/local.rules"
+  "/etc/suricata/threshold.config|monitorizacion/suricata/threshold.config"
+  "$REPO/docker-compose/wazuh-docker/single-node/docker-compose.yml|monitorizacion/wazuh/docker-compose.yml"
+  "$REPO/docker-compose/wazuh-docker/single-node/config/wazuh_rules/local_rules.xml|monitorizacion/wazuh/local_rules.xml"
+  "$REPO/docker-compose/wazuh-docker/single-node/setup.sh|monitorizacion/wazuh/setup.sh"
+  "$REPO/docker-compose/wazuh-docker/single-node/.env.example|monitorizacion/wazuh/.env.example"
 )
 
 SOLO_VER=0

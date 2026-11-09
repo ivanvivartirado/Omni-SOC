@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Omni SOC · Monitorización, detección y respuesta en una red pyme</title>
+<meta name="description" content="Omni SOC: infraestructura de red virtualizada que simula una pyme y despliega un pequeño SOC con Wazuh, Suricata y pfSense, todo como código con Vagrant y Ansible.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fog: #EDF0F3;
+  --paper: #F8F9FB;
+  --ink: #18202C;
+  --muted: #56606F;
+  --line: #CDD3DB;
+  --red: #B4232C;
+  --red-soft: #F6E3E4;
+  --blue: #1F5FA8;
+  --blue-soft: #E1EBF6;
+  --console: #1B2433;
+  --console-ink: #DCE3EC;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --wrap: 72rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --fog: #121821;
+    --paper: #19212C;
+    --ink: #E6EAF0;
+    --muted: #9AA5B4;
+    --line: #2C3644;
+    --red: #F06A70;
+    --red-soft: #3A1E23;
+    --blue: #6FA6E8;
+    --blue-soft: #1A2A40;
+    --console: #0E141C;
+    --console-ink: #DCE3EC;
+  }
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--fog);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+a { color: var(--blue); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+img, svg { max-width: 100%; }
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 1.5rem; }
+
+/* Nav */
+.top {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding-top: 1.25rem; padding-bottom: 1.25rem; flex-wrap: wrap;
+}
+.brand { font-family: var(--display); font-weight: 800; font-size: 1.25rem; color: var(--ink); text-decoration: none; letter-spacing: -0.01em; }
+.brand span { display: inline-block; width: .7em; height: .7em; margin-right: .45em; border-radius: 50%;
+  background: linear-gradient(90deg, var(--red) 50%, var(--blue) 50%); vertical-align: -0.02em; }
+.top nav { display: flex; gap: 1.25rem; flex-wrap: wrap; font-size: .95rem; }
+.top nav a { color: var(--muted); text-decoration: none; }
+.top nav a:hover { color: var(--ink); }
+
+/* Hero */
+.hero {
+  display: grid; grid-template-columns: 1.05fr 1fr; gap: 3rem; align-items: center;
+  padding-top: 3rem; padding-bottom: 4.5rem;
+}
+.hero h1 {
+  font-family: var(--display); font-weight: 800;
+  font-size: clamp(2.4rem, 5.2vw, 4.1rem); line-height: 1.02; letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+}
+.hero .lede { font-size: 1.2rem; color: var(--muted); max-width: 34rem; margin: 0 0 2rem; }
+.actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+.btn {
+  display: inline-block; padding: .75rem 1.2rem; border-radius: 8px; font-weight: 700; text-decoration: none;
+  border: 2px solid var(--ink); color: var(--ink);
+}
+.btn.primary { background: var(--ink); color: var(--fog); }
+.btn:hover { transform: translateY(-1px); }
+
+/* Console: el elemento memorable */
+.console {
+  background: var(--console); color: var(--console-ink); border-radius: 14px;
+  font-family: var(--mono); font-size: .82rem; line-height: 1.55;
+  box-shadow: 0 30px 60px -30px rgba(10, 20, 40, .55);
+  overflow: hidden;
+}
+.console-head { display: flex; justify-content: space-between; padding: .7rem 1rem; border-bottom: 1px solid rgba(255,255,255,.08); color: #8C98A9; font-size: .75rem; }
+.console-body { padding: 1rem 1rem 1.2rem; overflow-x: auto; }
+.pair { margin-bottom: 1rem; }
+.pair:last-child { margin-bottom: 0; }
+.ev { display: grid; grid-template-columns: 4.6rem 1fr; gap: .6rem; white-space: nowrap; }
+.ev .who { font-weight: 600; }
+.ev.atk .who { color: #FF8A8F; }
+.ev.det .who { color: #8EC1FF; }
+.ev.det .msg { color: #fff; }
+.ev .sev { display: inline-block; padding: 0 .4em; margin-left: .4em; border-radius: 3px; background: #8EC1FF; color: #0E141C; font-weight: 600; }
+.console-foot { padding: .6rem 1rem; border-top: 1px solid rgba(255,255,255,.08); color: #8C98A9; font-size: .72rem; font-family: var(--body); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .console .ev { opacity: 0; animation: appear .01s forwards; }
+  .console .ev.det { animation: appear .01s forwards, flash 1.2s ease-out forwards; }
+  .p1 .atk { animation-delay: .5s; }  .p1 .det { animation-delay: 1.3s, 1.3s; }
+  .p2 .atk { animation-delay: 2.1s; } .p2 .det { animation-delay: 2.9s, 2.9s; }
+  .p3 .atk { animation-delay: 3.7s; } .p3 .det { animation-delay: 4.5s, 4.5s; }
+  @keyframes appear { to { opacity: 1; } }
+  @keyframes flash { from { background: rgba(142,193,255,.22); } to { background: transparent; } }
+}
+
+/* Secciones */
+section { padding: 4.5rem 0; }
+section + section { border-top: 1px solid var(--line); }
+h2 {
+  font-family: var(--display); font-weight: 700; letter-spacing: -0.02em;
+  font-size: clamp(1.8rem, 3.4vw, 2.5rem); line-height: 1.1; margin: 0 0 1rem;
+}
+h3 { font-family: var(--display); font-weight: 700; font-size: 1.2rem; margin: 0 0 .4rem; letter-spacing: -0.01em; }
+.intro { max-width: 42rem; color: var(--muted); margin: 0 0 2.5rem; }
+p { max-width: 42rem; }
+
+/* Problema */
+.problem { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.problem blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500; font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  line-height: 1.25; letter-spacing: -0.01em; border-left: 4px solid var(--red); padding-left: 1.25rem;
+}
+.who-list { list-style: none; padding: 0; margin: 1.25rem 0 0; }
+.who-list li { padding: .6rem 0; border-bottom: 1px solid var(--line); }
+.who-list li:last-child { border-bottom: 0; }
+
+/* Topología */
+.topo-box { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 1.5rem; overflow-x: auto; }
+.topo { min-width: 720px; display: block; margin: 0 auto; }
+.topo text { font-family: var(--body); fill: var(--ink); }
+.topo .small { font-size: 12px; fill: var(--muted); }
+.topo .node { fill: var(--paper); stroke: var(--line); stroke-width: 1.5; }
+.topo .node.fw { fill: var(--ink); stroke: var(--ink); }
+.topo .node.fw + text, .topo .fwtext { fill: var(--fog); }
+.topo .node.soc { fill: var(--blue-soft); stroke: var(--blue); }
+.topo .node.atk { fill: var(--red-soft); stroke: var(--red); stroke-dasharray: 5 4; }
+.topo .link { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+.topo .logs { stroke: var(--blue); stroke-width: 1.5; fill: none; stroke-dasharray: 2 5; }
+.topo-note { font-size: .9rem; color: var(--muted); margin: 1rem 0 0; }
+.legend { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .9rem; color: var(--muted); margin-top: .75rem; }
+.legend i { display: inline-block; width: 1.4rem; height: 0; border-top: 2px solid var(--muted); vertical-align: middle; margin-right: .4rem; }
+.legend i.l { border-top: 2px dotted var(--blue); }
+.legend i.a { border-top: 2px dashed var(--red); }
+
+/* Escenarios: ataque frente a detección */
+.scen { width: 100%; border-collapse: collapse; }
+.scen-wrap { overflow-x: auto; }
+.scen th, .scen td { text-align: left; vertical-align: top; padding: 1.1rem 1rem; border-bottom: 1px solid var(--line); }
+.scen thead th { font-family: var(--display); font-size: 1rem; font-weight: 700; border-bottom: 2px solid var(--ink); }
+.scen thead th.r { color: var(--red); }
+.scen thead th.b { color: var(--blue); }
+.scen tbody th { font-family: var(--display); font-weight: 700; width: 22%; }
+.scen td code { font-family: var(--mono); font-size: .85em; background: var(--paper); border: 1px solid var(--line); padding: .05em .35em; border-radius: 4px; }
+.scen .cu { display: block; font-family: var(--body); font-weight: 400; font-size: .85rem; color: var(--muted); }
+
+/* Stack */
+.stack { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+.stack h3 { padding-bottom: .5rem; border-bottom: 2px solid var(--ink); margin-bottom: .75rem; }
+.stack ul { list-style: none; padding: 0; margin: 0; }
+.stack li { padding: .3rem 0; }
+.stack li b { font-weight: 700; }
+.stack li span { color: var(--muted); }
+
+/* Fases (secuencia real, por eso numeradas) */
+.phases { list-style: none; padding: 0; margin: 0; counter-reset: f; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; }
+.phases li { counter-increment: f; padding: 0 1rem 0 0; position: relative; }
+.phases li::before {
+  content: counter(f); display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  background: var(--paper); border: 2px solid var(--ink); font-family: var(--display); font-weight: 800; margin-bottom: .75rem;
+  position: relative; z-index: 1;
+}
+.phases li::after { content: ""; position: absolute; top: 1.1rem; left: 2.2rem; right: 0; border-top: 2px solid var(--line); }
+.phases li:last-child::after { display: none; }
+.phases b { display: block; font-family: var(--display); font-size: 1rem; line-height: 1.2; margin-bottom: .3rem; }
+.phases span { font-size: .9rem; color: var(--muted); display: block; }
+
+/* Repo */
+.repo { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+.tree { font-family: var(--mono); font-size: .9rem; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 0; overflow-x: auto; line-height: 1.9; }
+.tree a { color: var(--ink); text-decoration: none; font-weight: 600; }
+.tree a:hover { color: var(--blue); text-decoration: underline; }
+.tree .c { color: var(--muted); }
+
+/* Equipo */
+.team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.person h3 { margin-bottom: .2rem; }
+.person p { margin: 0; color: var(--muted); }
+.tag { display: inline-block; margin-top: .6rem; font-size: .85rem; padding: .15rem .6rem; border-radius: 999px; }
+.tag.b { background: var(--blue-soft); color: var(--blue); }
+.tag.r { background: var(--red-soft); color: var(--red); }
+.tag.n { background: var(--paper); color: var(--muted); border: 1px solid var(--line); }
+
+footer { padding: 2.5rem 0 3rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+footer .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+@media (max-width: 960px) {
+  .hero, .problem, .repo { grid-template-columns: 1fr; gap: 2rem; }
+  .stack { grid-template-columns: repeat(2, 1fr); }
+  .phases { grid-template-columns: 1fr; gap: 1.25rem; }
+  .phases li { display: grid; grid-template-columns: 2.2rem 1fr; column-gap: 1rem; padding: 0; }
+  .phases li::before { margin: 0; grid-row: span 2; }
+  .phases li::after { top: 2.2rem; bottom: -1.25rem; left: 1.05rem; right: auto; border-top: 0; border-left: 2px solid var(--line); }
+  .team { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .stack { grid-template-columns: 1fr; }
+  .top nav { gap: .9rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="wrap top">
+  <a class="brand" href="#"><span aria-hidden="true"></span>Omni SOC</a>
+  <nav aria-label="Secciones">
+    <a href="#problema">Problema</a>
+    <a href="#arquitectura">Arquitectura</a>
+    <a href="#escenarios">Escenarios</a>
+    <a href="#tecnologias">Tecnologías</a>
+    <a href="#planificacion">Planificación</a>
+    <a href="#equipo">Equipo</a>
+  </nav>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <h1>Una pyme simulada, vigilada como lo haría un equipo de seguridad.</h1>
+      <p class="lede">Omni SOC es una red virtualizada con servidores, clientes y cortafuegos, sobre la que funciona un pequeño Centro de Operaciones de Seguridad: centraliza logs, detecta ataques, avisa y documenta la respuesta. Todo se despliega como código.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/ivanvivartirado/Omni-SOC">Ver el repositorio</a>
+        <a class="btn" href="https://github.com/users/ivanvivartirado/projects/3/views/1">Ver el tablero de tareas</a>
+      </div>
+    </div>
+
+    <figure class="console" aria-label="Ejemplo de escenario de prueba: ataques del red team y alertas del SOC">
+      <div class="console-head"><span>red team ⇄ blue team</span><span>laboratorio</span></div>
+      <div class="console-body">
+        <div class="pair p1">
+          <div class="ev atk"><span class="who">kali</span><span class="msg">hydra -l admin ssh://srv-linux</span></div>
+          <div class="ev det"><span class="who">wazuh</span><span class="msg">fuerza bruta SSH en srv-linux<span class="sev">alta</span></span></div>
+        </div>
+        <div class="pair p2">
+          <div class="ev atk"><span class="who">kali</span><span class="msg">nmap -sS red de servidores</span></div>
+          <div class="ev det"><span class="who">suricata</span><span class="msg">patrón de escaneo de puertos<span class="sev">media</span></span></div>
+        </div>
+        <div class="pair p3">
+          <div class="ev atk"><span class="who">cliente</span><span class="msg">descarga eicar.com</span></div>
+          <div class="ev det"><span class="who">wazuh</span><span class="msg">firma de malware en cliente-01<span class="sev">alta</span></span></div>
+        </div>
+      </div>
+      <figcaption class="console-foot">Los tres escenarios de prueba que el entorno debe detectar.</figcaption>
+    </figure>
+  </div>
+
+  <section id="problema">
+    <div class="wrap problem">
+      <div>
+        <h2>El problema</h2>
+        <blockquote>Muchas pymes no tienen personal ni presupuesto para un departamento de ciberseguridad. Cuando sufren un incidente, lo descubren tarde o no lo descubren nunca.</blockquote>
+      </div>
+      <div>
+        <p>Nadie monitoriza el tráfico y los intentos de intrusión pasan desapercibidos. Omni SOC aborda esa falta de visibilidad y de capacidad de respuesta en infraestructuras pequeñas, con herramientas libres y un despliegue reproducible.</p>
+        <ul class="who-list">
+          <li><strong>Pymes sin SOC propio</strong>, como modelo realista de cómo ganar visibilidad.</li>
+          <li><strong>Administradores y técnicos de red</strong>, que son quienes operan la monitorización y la respuesta.</li>
+          <li><strong>Estudiantes y técnicos en formación</strong>, como laboratorio para aprender a montar y operar un SOC básico.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="arquitectura">
+    <div class="wrap">
+      <h2>Arquitectura</h2>
+      <p class="intro">Un cortafuegos pfSense separa la red en VLANs por función. Cada equipo lleva un agente de Wazuh que envía sus registros al servidor del SOC, y Suricata analiza el tráfico entre segmentos. El atacante vive en un segmento de laboratorio aparte.</p>
+
+      <div class="topo-box">
+        <svg class="topo" viewBox="0 0 900 380" role="img" aria-labelledby="topo-t topo-d">
+          <title id="topo-t">Topología de Omni SOC</title>
+          <desc id="topo-d">El cortafuegos pfSense conecta cuatro segmentos: servidores (Active Directory y Linux con DNS, DHCP y web), clientes, SOC (Wazuh y Suricata) y laboratorio atacante con Kali Linux. Los agentes de los servidores y clientes envían logs al SOC.</desc>
+
+          <!-- enlaces -->
+          <path class="link" d="M450 70 V110"/>
+          <path class="link" d="M450 160 V190 H120 V220"/>
+          <path class="link" d="M450 190 H340 V220"/>
+          <path class="link" d="M450 190 H560 V220"/>
+          <path class="link" d="M450 190 H780 V220" stroke-dasharray="6 4" style="stroke: var(--red)"/>
+          <!-- flujo de logs -->
+          <path class="logs" d="M120 330 V355 H560 V330"/>
+          <path class="logs" d="M340 330 V355"/>
+
+          <!-- internet -->
+          <rect class="node" x="390" y="30" width="120" height="40" rx="20"/>
+          <text x="450" y="55" text-anchor="middle" font-size="14">Internet</text>
+
+          <!-- firewall -->
+          <rect class="node fw" x="365" y="110" width="170" height="50" rx="8"/>
+          <text class="fwtext" x="450" y="132" text-anchor="middle" font-size="15" font-weight="700">pfSense</text>
+          <text class="fwtext" x="450" y="150" text-anchor="middle" font-size="12">cortafuegos · VLANs</text>
+
+          <!-- servidores -->
+          <rect class="node" x="30" y="220" width="180" height="110" rx="10"/>
+          <text x="120" y="246" text-anchor="middle" font-size="15" font-weight="700">Servidores</text>
+          <text class="small" x="120" y="270" text-anchor="middle">Windows Server · AD</text>
+          <text class="small" x="120" y="290" text-anchor="middle">Linux · DNS, DHCP (Kea)</text>
+          <text class="small" x="120" y="310" text-anchor="middle">Web (Apache)</text>
+
+          <!-- clientes -->
+          <rect class="node" x="250" y="220" width="180" height="110" rx="10"/>
+          <text x="340" y="246" text-anchor="middle" font-size="15" font-weight="700">Clientes</text>
+          <text class="small" x="340" y="270" text-anchor="middle">Puestos de empleados</text>
+          <text class="small" x="340" y="290" text-anchor="middle">Agente Wazuh</text>
+
+          <!-- soc -->
+          <rect class="node soc" x="470" y="220" width="180" height="110" rx="10"/>
+          <text x="560" y="246" text-anchor="middle" font-size="15" font-weight="700">SOC</text>
+          <text class="small" x="560" y="270" text-anchor="middle">Wazuh · SIEM y panel</text>
+          <text class="small" x="560" y="290" text-anchor="middle">Suricata · IDS de red</text>
+          <text class="small" x="560" y="310" text-anchor="middle">Alertas al administrador</text>
+
+          <!-- atacante -->
+          <rect class="node atk" x="690" y="220" width="180" height="110" rx="10"/>
+          <text x="780" y="246" text-anchor="middle" font-size="15" font-weight="700">Laboratorio</text>
+          <text class="small" x="780" y="270" text-anchor="middle">Kali Linux</text>
+          <text class="small" x="780" y="290" text-anchor="middle">Nmap · Hydra · EICAR</text>
+
+          <text class="small" x="340" y="374" text-anchor="middle">logs de los agentes → SIEM</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i></i>Red segmentada</span>
+        <span><i class="l"></i>Envío de logs</span>
+        <span><i class="a"></i>Tráfico de ataque controlado</span>
+      </div>
+      <p class="topo-note">Topología provisional: el direccionamiento y la asignación final de VLANs se documentarán en <a href="https://github.com/ivanvivartirado/Omni-SOC/tree/main/docs">docs/</a>.</p>
+    </div>
+  </section>
+
+  <section id="escenarios">
+    <div class="wrap">
+      <h2>Escenarios de prueba</h2>
+      <p class="intro">Cada ataque del red team tiene una detección esperada del blue team. El objetivo es detectar el 100&nbsp;% de los escenarios definidos y que la alerta llegue al panel en menos de un minuto.</p>
+      <div class="scen-wrap">
+        <table class="scen">
+          <thead>
+            <tr><th scope="col">Escenario</th><th scope="col" class="r">Ataque</th><th scope="col" class="b">Detección esperada</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Fuerza bruta<span class="cu">CU2</span></th>
+              <td>Hydra contra un servicio expuesto, por ejemplo <code>ssh</code>.</td>
+              <td>Wazuh registra los intentos fallidos y genera una alerta en el panel.</td>
+            </tr>
+            <tr>
+              <th scope="row">Escaneo de red<span class="cu">CU3</span></th>
+              <td>Escaneo de puertos con <code>nmap</code> contra la red simulada.</td>
+              <td>Suricata reconoce el patrón y el SIEM muestra una alerta de reconocimiento.</td>
+            </tr>
+            <tr>
+              <th scope="row">Malware de prueba<span class="cu">CU4</span></th>
+              <td>Descarga o ejecución del fichero <code>EICAR</code> en un cliente.</td>
+              <td>El agente de Wazuh detecta la firma e identifica el equipo afectado.</td>
+            </tr>
+            <tr>
+              <th scope="row">Respuesta<span class="cu">CU5</span></th>
+              <td>Cualquiera de los anteriores.</td>
+              <td>El analista sigue el procedimiento: aislar el equipo, revisar logs, contener y documentar causa y acción.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="tecnologias">
+    <div class="wrap">
+      <h2>Tecnologías</h2>
+      <p class="intro">Herramientas libres y ampliamente usadas en entornos reales, elegidas para que el laboratorio se parezca lo máximo posible a un SOC de verdad.</p>
+      <div class="stack">
+        <div>
+          <h3>Red y servicios</h3>
+          <ul>
+            <li><b>pfSense</b> <span>cortafuegos y VLANs</span></li>
+            <li><b>Windows Server</b> <span>Active Directory</span></li>
+            <li><b>Linux</b> <span>servidores</span></li>
+            <li><b>Kea</b> <span>DHCP</span></li>
+            <li><b>Apache</b> <span>web</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Seguridad</h3>
+          <ul>
+            <li><b>Wazuh</b> <span>SIEM y panel</span></li>
+            <li><b>Suricata</b> <span>IDS de red</span></li>
+            <li><b>Kali Linux</b> <span>ataques controlados</span></li>
+            <li><b>Nmap · Hydra · EICAR</b></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Automatización</h3>
+          <ul>
+            <li><b>VirtualBox</b> <span>virtualización</span></li>
+            <li><b>Vagrant</b> <span>máquinas como código</span></li>
+            <li><b>Ansible</b> <span>configuración</span></li>
+            <li><b>Bash</b> <span>scripts</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Formatos y trabajo</h3>
+          <ul>
+            <li><b>YAML</b> <span>playbooks</span></li>
+            <li><b>Ruby</b> <span>Vagrantfile</span></li>
+            <li><b>XML</b> <span>reglas de Wazuh</span></li>
+            <li><b>Git y GitHub</b> <span>versiones y kanban</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="planificacion">
+    <div class="wrap">
+      <h2>Planificación</h2>
+      <p class="intro">El proyecto avanza en siete fases. El seguimiento día a día está en el <a href="https://github.com/users/ivanvivartirado/projects/3/views/1">tablero de GitHub Projects</a>.</p>
+      <ol class="phases">
+        <li><b>Diseño</b><span>Requisitos, topología y elección de herramientas</span></li>
+        <li><b>Infraestructura base</b><span>VLANs, firewall, servidores y servicios</span></li>
+        <li><b>SOC</b><span>Wazuh, Suricata y reglas de detección</span></li>
+        <li><b>Automatización</b><span>Playbooks y despliegue reproducible</span></li>
+        <li><b>Ataques y ajuste</b><span>Pruebas y afinado de alertas</span></li>
+        <li><b>Respuesta</b><span>Procedimientos y registro de incidentes</span></li>
+        <li><b>Memoria</b><span>Redacción y defensa</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="repositorio">
+    <div class="wrap repo">
+      <div>
+        <h2>Estructura del repositorio</h2>
+        <p>La infraestructura entera vive en el repositorio. Clonarlo y lanzar el despliegue debe levantar el mismo entorno en cualquier equipo que cumpla los requisitos de virtualización, sin configurar nada a mano.</p>
+        <p>Las instrucciones de despliegue se añadirán al README cuando estén cerradas.</p>
+      </div>
+<pre class="tree"><a href="https://github.com/ivanvivartirado/Omni-SOC">Omni-SOC/</a>
+├── <a href="https://github.com/ivanvivartirado/Omni-SOC/tree/main/infra">infra/</a>          <span class="c">máquinas y red como código</span>
+├── <a href="https://github.com/ivanvivartirado/Omni-SOC/tree/main/monitorizacion">monitorizacion/</a> <span class="c">Wazuh y Suricata</span>
+├── <a href="https://github.com/ivanvivartirado/Omni-SOC/tree/main/blue-team">blue-team/</a>      <span class="c">reglas y respuesta</span>
+├── <a href="https://github.com/ivanvivartirado/Omni-SOC/tree/main/red-team">red-team/</a>       <span class="c">ataques controlados</span>
+├── <a href="https://github.com/ivanvivartirado/Omni-SOC/tree/main/scripts">scripts/</a>        <span class="c">utilidades</span>
+└── <a href="https://github.com/ivanvivartirado/Omni-SOC/tree/main/docs">docs/</a>           <span class="c">documentación</span></pre>
+    </div>
+  </section>
+
+  <section id="equipo">
+    <div class="wrap">
+      <h2>Equipo</h2>
+      <p class="intro">Proyecto intermodular del CFGS de Administración de Sistemas Informáticos en Red (ASIR) en el Institut Puig Castellar, curso 2025-2026.</p>
+      <div class="team">
+        <div class="person">
+          <h3>Iván Vivar Tirado</h3>
+          <p>SIEM e IDS: Wazuh, Suricata y reglas de detección.</p>
+          <span class="tag b">Blue team</span>
+        </div>
+        <div class="person">
+          <h3>Iker Sánchez Fuentes</h3>
+          <p>Infraestructura de red: VLANs, firewall y servidores.</p>
+          <span class="tag n">Infraestructura</span>
+        </div>
+        <div class="person">
+          <h3>Ambos</h3>
+          <p>Simulación de ataques, automatización del despliegue y documentación.</p>
+          <span class="tag r">Red team</span>
+        </div>
+      </div>
+      <p style="margin-top:2.5rem;color:var(--muted)">Tutor: David García.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Omni SOC · Licencia MIT</span>
+    <a href="https://github.com/ivanvivartirado/Omni-SOC">github.com/ivanvivartirado/Omni-SOC</a>
+  </div>
+</footer>
+
+</body>
+</html>

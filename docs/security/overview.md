@@ -39,16 +39,16 @@ Publicaciones configuradas por el override:
 - Dashboard: HTTPS publicado en el puerto 443 según el Compose base.
 - Se elimina la publicación UDP/514 del manager. La recepción de syslog TCP/514 del host se gestiona mediante rsyslog por separado.
 
-Validación de configuración (desde el directorio del Compose base):
+Validación de configuración (desde `docker-compose/wazuh-docker/single-node`, dentro del repositorio):
 
 ```bash
 docker compose \
   -f docker-compose.yml \
-  -f /home/ivan/Omni-SOC/infra/wazuh/compose.hardening.yml \
+  -f ../../../infra/wazuh/compose.hardening.yml \
   config --quiet
 ```
 
-La ruta absoluta del ejemplo debe ajustarse a la ubicación real del repositorio en cada instalación. Para aplicar el override al despliegue, usar los mismos dos archivos con `up -d`, después de validar la configuración y comprobar que los secretos y certificados locales están disponibles.
+La ruta relativa presupone que el repositorio mantiene la estructura indicada. Para aplicar el override al despliegue, usar los mismos dos archivos con `up -d`, después de validar la configuración y comprobar que los secretos y certificados locales están disponibles.
 
 Comprobación de publicaciones activas:
 

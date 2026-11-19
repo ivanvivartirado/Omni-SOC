@@ -1,0 +1,10 @@
+services:
+  wazuh.manager:
+    ports: !override
+      - "1514:1514"
+      - "1515:1515"
+      - "127.0.0.1:55000:55000"
+
+  wazuh.indexer:
+    ports: !override
+      - "127.0.0.1:9200:9200"

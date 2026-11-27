@@ -1,0 +1,73 @@
+=====================================================
+  KALICONFIG.TXT - Configuración y guía de ataques
+  Proyecto Omni-SOC - Máquina omni-kali (Red Team)
+=====================================================
+
+1. CONFIGURACIÓN PREVIA DE OMNI-KALI
+--------------------------------------
+- IP de la máquina: 192.168.X.X (reserva DHCP en Kea)
+- Interfaz de red: eth1 (o la que corresponda)
+- Paquetes instalados que no venían por defecto:
+    sudo apt update
+    sudo apt install -y openssh-server hydra nmap
+
+- Habilitar SSH (si quieres acceder en remoto a omni-kali):
+    sudo systemctl enable ssh
+    sudo systemctl start ssh
+
+- Comprobar conectividad con la máquina objetivo (omni-server/omni-cliente):
+    ping -c 4 <IP_OBJETIVO>
+
+- Verificar que las herramientas están instaladas:
+    nmap --version
+    hydra -h
+
+2. OBJETIVO DE LAS PRUEBAS
+--------------------------------------
+Simular ataques comunes contra la máquina de blue team (omni-server) para
+comprobar que Suricata y Wazuh detectan la actividad maliciosa y generan
+alertas correctamente. Todas las pruebas se realizan en un entorno de
+laboratorio propio y aislado, con fines exclusivamente educativos.
+
+3. TÉCNICAS DE ATAQUE DOCUMENTADAS
+--------------------------------------
+
+3.1. Escaneo de puertos (reconocimiento)
+    Herramienta: Nmap
+    Comando de ejemplo:
+        nmap -sS -p- <IP_OBJETIVO>
+    Qué se espera ver en Wazuh/Suricata:
+        Alerta de "reconocimiento de red" / escaneo SYN (regla local
+        configurada en Suricata para detección de escaneo de puertos).
+
+3.2. Fuerza bruta SSH
+    Herramienta: Hydra
+    Comando de ejemplo:
+        hydra -l <usuario> -P <diccionario.txt> ssh://<IP_OBJETIVO>
+    Qué se espera ver:
+        Alerta de múltiples intentos fallidos de autenticación SSH
+        en el dashboard de Wazuh.
+
+3.3. Malware de prueba (EICAR)
+    Procedimiento:
+        Descargar/crear el fichero de test EICAR en el cliente y comprobar
+        que el agente de Wazuh (o el módulo correspondiente) lo detecta.
+    Qué se espera ver:
+        Alerta de malware con el equipo afectado identificado.
+
+3.4. [Pendiente: SQL injection]
+    Herramienta: (sqlmap / pruebas manuales)
+    Requiere: que la web del servidor Apache tenga un formulario o
+    parámetro vulnerable de prueba.
+    Comando de ejemplo:
+        sqlmap -u "http://<IP_OBJETIVO>/pagina.php?id=1" --batch
+    Qué se espera ver:
+        Alerta de intento de inyección SQL en Suricata/Wazuh (si hay
+        regla configurada para patrones de SQLi).
+
+4. NOTAS
+--------------------------------------
+- Todas las pruebas se ejecutan solo contra máquinas propias del
+  laboratorio (red 192.168.X.X/24), nunca contra sistemas externos.
+- Referencia a los casos de uso del documento funcional: CU2 (Hydra),
+  CU3 (Nmap), CU4 (EICAR).
